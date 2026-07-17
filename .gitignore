@@ -1,1 +1,12 @@
 .claude/
+
+# Raw source media not referenced by index.html — kept locally as
+# spare/unused source material, excluded to keep the repo lean.
+assets/images/FullSizeRender.MP4
+assets/images/IMG 66666.JPEG
+assets/images/IMG_5841.JPEG
+assets/images/IMG_6382.JPEG
+assets/images/IMG_6383.JPEG
+assets/images/IMG_8116.JPEG
+assets/images/interest-rf-attempted-match.mp4
+assets/images/interest-rf-og.jpg
