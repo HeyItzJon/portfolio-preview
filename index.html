@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonathan Bourget — EE Co-op Candidate</title>
+<link rel="icon" type="image/png" href="assets/images/site-logo-j.png">
+<meta name="description" content="Jonathan Bourget — Electrical Engineering co-op student at Carleton University. PCB design, embedded systems, and hands-on hardware builds.">
+
+<script>
+  // Applied synchronously, before first paint, so there's no flash of the
+  // wrong theme on load.
+  (function () {
+    try {
+      var stored = localStorage.getItem('theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --bg:          #FFFFFF;
+  --bg-soft:     #F6F7FB;
+  --surface:     #FFFFFF;   /* card/panel fill */
+  --nav-bg:      rgba(255,255,255,0.82);
+  --contact-bg:  #12141A;
+  --contact-bg-2: #1a1d27;
+  --ink:         #12141A;
+  --muted:       #6B7280;
+  --accent:      #0284C7;   /* electric blue */
+  --accent-2:    #06B6D4;   /* cyan */
+  --accent-soft: #E0F2FE;
+  --line:        #E8ECF1;
+  --line-strong: #D3DAE3;
+  --grad: linear-gradient(135deg, var(--accent), var(--accent-2));
+  --btn-outline-bg: #FFFFFF;
+  --cta-bg: var(--ink);
+  --cta-fg: #FFFFFF;
+
+  --shadow-sm: 0 2px 8px rgba(18,20,26,0.06);
+  --shadow-md: 0 8px 24px rgba(18,20,26,0.08);
+  --shadow-lg: 0 20px 50px rgba(18,20,26,0.12);
+  --shadow-accent: 0 12px 28px rgba(2,132,199,0.30);
+
+  --font-display: 'Space Grotesk', 'Arial', sans-serif;
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --maxw: 1320px;
+  --pad: clamp(20px, 5vw, 64px);
+  --r-lg: 24px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --r-full: 999px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg:          #0A0C11;
+  --bg-soft:     #12151D;
+  --surface:     #151922;
+  --nav-bg:      rgba(10,12,17,0.78);
+  --contact-bg:  #10131b;
+  --contact-bg-2: #171c28;
+  --ink:         #EDEFF3;
+  --muted:       #9BA3B4;
+  --accent:      #38BDF8;   /* brighter on dark so it still pops */
+  --accent-2:    #22D3EE;
+  --accent-soft: rgba(56,189,248,0.14);
+  --line:        rgba(255,255,255,0.09);
+  --line-strong: rgba(255,255,255,0.16);
+  --btn-outline-bg: rgba(255,255,255,0.04);
+  --cta-bg: var(--accent);
+  --cta-fg: #06090F;
+
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.35);
+  --shadow-md: 0 10px 28px rgba(0,0,0,0.45);
+  --shadow-lg: 0 24px 56px rgba(0,0,0,0.55);
+  --shadow-accent: 0 14px 32px rgba(56,189,248,0.28);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .pin-section { height: auto !important; margin-top: 0 !important; }
+  .pin-sticky { position: static !important; height: auto !important; }
+  .pin-layer { position: static !important; opacity: 1 !important; transform: none !important; padding: 80px var(--pad) !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+body, body * {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: var(--pad);
+  padding-right: var(--pad);
+}
+
+/* ---- Page routing: only the active page is visible ---- */
+.page { display: none; }
+.page.active { display: block; animation: pageIn 0.45s var(--ease); }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Eyebrow pill ---- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--tc1, var(--accent));
+  background: var(--tsoft, var(--accent-soft));
+  padding: 7px 16px;
+  border-radius: var(--r-full);
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+.eyebrow-short { display: none; }
+
+/* ---- Nav ---- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+.nav-logo .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--grad); }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0; padding: 0;
+  font-size: 14.5px;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+  padding: 9px 16px;
+  border-radius: var(--r-full);
+  cursor: pointer;
+}
+.nav-links a:hover, .nav-links a:focus-visible { color: var(--ink); background: var(--bg-soft); }
+.nav-links a.current { color: var(--accent); background: var(--accent-soft); }
+.nav-cta {
+  font-weight: 600 !important;
+  color: var(--cta-fg) !important;
+  background: var(--cta-bg) !important;
+  margin-left: 8px;
+}
+.nav-cta:hover { background: var(--accent) !important; color: #fff !important; }
+:root[data-theme="dark"] .nav-cta:hover { color: #06090F !important; }
+
+.theme-toggle {
+  position: relative;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-soft);
+  color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  margin-left: 10px;
+  flex-shrink: 0;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
+}
+.theme-toggle:hover { border-color: var(--accent); transform: rotate(-8deg) scale(1.06); }
+.theme-toggle svg {
+  width: 18px; height: 18px;
+  position: absolute; top: 50%; left: 50%;
+  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease);
+}
+.theme-toggle .icon-moon { opacity: 0; transform: translate(-50%,-50%) scale(0.5) rotate(40deg); }
+.theme-toggle .icon-sun { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+:root[data-theme="dark"] .theme-toggle .icon-sun { opacity: 0; transform: translate(-50%,-50%) scale(0.5) rotate(-40deg); }
+:root[data-theme="dark"] .theme-toggle .icon-moon { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px; height: 36px;
+  background: none; border: none;
+  cursor: pointer; padding: 0;
+}
+.nav-burger span {
+  display: block; width: 100%; height: 2px;
+  border-radius: 2px; background: var(--ink);
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---- Buttons ---- */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: var(--r-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s, color 0.25s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary { background: var(--grad); color: #fff; box-shadow: var(--shadow-accent); }
+.btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 34px rgba(2,132,199,0.38); }
+.btn-outline { background: var(--btn-outline-bg); border: 1.5px solid var(--line-strong); color: var(--ink); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+/* ---- Hero / scroll crossfade ---- */
+.pin-section { position: relative; height: 130vh; }
+.pin-sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+.pin-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 var(--pad);
+  will-change: opacity, transform;
+}
+.pin-hero { z-index: 2; }
+.pin-intro { z-index: 1; opacity: 0; }
+.pin-third { z-index: 0; opacity: 0; }
+.pin-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+.pin-icons { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.pin-icon { position: absolute; filter: blur(3px); }
+.pin-icon svg { display: block; width: 100%; height: 100%; }
+
+/* ---- Hero background video: scroll-scrubbed cinematic PCB reveal ---- */
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #05060a;
+}
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2,3,7,0.86) 0%, rgba(2,3,7,0.68) 32%, rgba(2,3,7,0.75) 68%, rgba(2,3,7,0.94) 100%);
+  pointer-events: none;
+}
+.hero-glow {
+  position: absolute; top: -260px; right: -200px;
+  width: 780px; height: 780px;
+  background: radial-gradient(circle, rgba(var(--flow-r1,2),var(--flow-g1,132),var(--flow-b1,199),0.28), rgba(var(--flow-r2,6),var(--flow-g2,182),var(--flow-b2,212),0.13) 55%, transparent 75%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.hero-glow-2 {
+  position: absolute; bottom: -360px; left: -280px;
+  width: 900px; height: 900px;
+  background: radial-gradient(circle, rgba(var(--flow-r2,6),var(--flow-g2,182),var(--flow-b2,212),0.24), rgba(var(--flow-r1,2),var(--flow-g1,132),var(--flow-b1,199),0.10) 55%, transparent 75%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+/* Crossfades the whole pinned hero (video + text) into the page background
+   right at the end of the scroll-jack, instead of hard-cutting into
+   the About section the instant it unpins. */
+.hero-unpin-fade {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 1; text-align: center; max-width: 800px; margin: 0 auto; }
+.pin-hero h1 { font-size: clamp(52px, 10vw, 104px); line-height: 1.04; color: #fff; }
+.grad-text {
+  background: linear-gradient(135deg, rgb(var(--flow-r1,2),var(--flow-g1,132),var(--flow-b1,199)), rgb(var(--flow-r2,6),var(--flow-g2,182),var(--flow-b2,212)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-sub { margin: 26px auto 0; font-size: 19px; color: rgba(255,255,255,0.72); max-width: 52ch; }
+
+/* Hero pin-sticky sits on a video, not the white page bg — flip text/eyebrow to light */
+#home .pin-sticky .eyebrow { background: rgba(255,255,255,0.14); color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+#home .intro-statement-text { color: #fff; }
+
+.intro-statement-text {
+  max-width: 46ch;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 3.6vw, 36px);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.intro-line { display: block; }
+.intro-line-2 { margin-top: 14px; }
+.intro-boxes {
+  margin: 44px auto 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  max-width: 480px;
+}
+.intro-box {
+  background: #fff;
+  padding: 22px 16px;
+  text-align: center;
+}
+.intro-box strong { display: block; font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+.intro-box span { font-size: 13px; color: var(--muted); }
+.hero-actions { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.hero-stats {
+  margin: 72px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  max-width: 720px;
+}
+.hero-stat { background: #fff; padding: 24px 16px; text-align: center; }
+.hero-stat strong { display: block; font-family: var(--font-display); font-size: 26px; font-weight: 700; }
+.hero-stat span { font-size: 13px; color: var(--muted); }
+
+/* ---- Sections ---- */
+section { padding: 100px 0; }
+.section-head { margin-bottom: 56px; max-width: 62ch; }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.section-head h2 { font-size: clamp(30px, 4vw, 42px); }
+.section-head p { color: var(--muted); margin-top: 16px; font-size: 17.5px; }
+
+/* ---- About ---- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 0.82fr 1.25fr;
+  gap: 64px;
+  align-items: center;
+}
+.about-copy p { margin: 0 0 18px; font-size: 17px; }
+.about-copy p:last-child { margin-bottom: 0; }
+.about-copy h2 { font-size: clamp(28px, 4vw, 38px); margin-bottom: 22px; }
+
+/* ---- Carousel ---- */
+.carousel {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 4 / 3.4;
+  background: var(--ink);
+}
+.carousel-track { display: flex; height: 100%; transition: transform 0.55s var(--ease); }
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #fff;
+  text-align: center;
+  padding: 32px;
+  overflow: hidden;
+}
+.carousel-slide img,
+.carousel-slide video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.carousel-slide::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), transparent 55%);
+  pointer-events: none;
+}
+.slide-label {
+  position: relative; z-index: 1;
+  font-weight: 600; font-size: 15px;
+  opacity: 0.94; max-width: 26ch;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+}
+.slide-tag {
+  position: absolute; top: 20px; left: 20px;
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  font-size: 12.5px; font-weight: 600;
+  z-index: 1;
+}
+.carousel-arrow {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s, background 0.2s;
+  z-index: 2;
+  font-size: 20px;
+  line-height: 1;
+  /* Always sits on a photo/video slide, not the page background — stay a
+     fixed dark-on-white regardless of site theme (var(--ink) would flip
+     light in dark mode and disappear against the white circle). */
+  color: #12141A;
+}
+.carousel-arrow:hover { transform: translateY(-50%) scale(1.1); background: #fff; }
+.carousel-arrow.prev { left: 16px; }
+.carousel-arrow.next { right: 16px; }
+.carousel-dots {
+  position: absolute; bottom: 18px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 2;
+}
+.carousel-dots button {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.45);
+  cursor: pointer; padding: 0;
+  transition: background 0.2s, width 0.2s;
+}
+.carousel-dots button.active { background: #fff; width: 22px; border-radius: var(--r-full); }
+
+/* ---- Placeholder gradients (coordinated blue/cyan family) ---- */
+.grad-1 { background: linear-gradient(135deg, #0284C7, #06B6D4); }
+.grad-2 { background: linear-gradient(135deg, #1E40AF, #3B82F6); }
+.grad-3 { background: linear-gradient(135deg, #0D9488, #34D399); }
+.grad-4 { background: linear-gradient(135deg, #0891B2, #38BDF8); }
+.grad-5 { background: linear-gradient(135deg, #334155, #0EA5E9); }
+
+/* ---- Project carousel: center card in focus, neighbours peek blurred ---- */
+/* Deck of cards: each .project-card is absolutely centered in the stage,
+   then JS fans them out around that center point (translate/rotate/scale)
+   and pulls the hovered one forward — a physical stack, not a slider.
+   Deliberately breaks out of the usual .wrap width — like the hero, this
+   is meant to feel like a full-width, imposing showcase, not a boxed-in
+   component. */
+.pcarousel-stage {
+  max-width: min(1680px, 94vw);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}
+.pcarousel {
+  position: relative;
+  height: clamp(460px, 38vw, 620px);
+  margin: 0 auto;
+  max-width: 100%;
+}
+.pcarousel-track {
+  position: absolute;
+  inset: 0;
+}
+.pcarousel .project-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(380px, 62vw);
+  transform-origin: 50% 82%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.pcarousel .project-card:hover,
+.pcarousel .project-card:focus-visible {
+  box-shadow: 0 26px 50px var(--tglow, rgba(18,20,26,0.2));
+  border-color: var(--tc1, var(--line-strong));
+  outline: none;
+}
+
+.pcarousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 40px;
+}
+.pcarousel-arrow {
+  width: 64px; height: 52px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--line-strong);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.pcarousel-arrow:hover {
+  border-color: var(--accent);
+  color: #fff;
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.pcarousel-arrow:active { transform: translateY(0) scale(0.97); }
+.pcarousel-dots { display: flex; gap: 8px; }
+.pcarousel-dots button {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: none;
+  background: var(--line-strong);
+  cursor: pointer; padding: 0;
+  transition: background 0.2s, width 0.2s;
+}
+.pcarousel-dots button.active {
+  background: linear-gradient(135deg, var(--dot-tc1, var(--accent)), var(--dot-tc2, var(--accent-2)));
+  width: 26px;
+  border-radius: var(--r-full);
+  transition: background 0.35s var(--ease), width 0.2s;
+}
+
+/* Project card base (shared) */
+/* ---- Project color themes ---- */
+.theme-blue   { --tc1: #0284C7; --tc2: #38BDF8; --tglow: rgba(2,132,199,0.38);  --tsoft: rgba(2,132,199,0.08); }
+.theme-red    { --tc1: #DC2626; --tc2: #F87171; --tglow: rgba(220,38,38,0.38); --tsoft: rgba(220,38,38,0.08); }
+.theme-green  { --tc1: #16A34A; --tc2: #4ADE80; --tglow: rgba(22,163,74,0.38); --tsoft: rgba(22,163,74,0.08); }
+.theme-amber  { --tc1: #D97706; --tc2: #FBBF24; --tglow: rgba(217,119,6,0.38); --tsoft: rgba(217,119,6,0.08); }
+.theme-purple { --tc1: #7C3AED; --tc2: #C084FC; --tglow: rgba(124,58,237,0.38); --tsoft: rgba(124,58,237,0.08); }
+
+.project-card {
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-md);
+  border: 2px solid transparent;
+  overflow: hidden;
+  cursor: pointer;
+}
+.project-thumb {
+  aspect-ratio: 4/3;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  color: #fff;
+  padding: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--tc1, var(--accent)), var(--tc2, var(--accent-2)));
+}
+.project-thumb img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+.project-card:hover .project-thumb img { transform: scale(1.05); }
+.project-thumb::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.35), transparent 50%);
+}
+.thumb-label {
+  position: relative; z-index: 1;
+  font-size: 11px; font-weight: 600;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(6px);
+  padding: 5px 10px;
+  border-radius: var(--r-full);
+}
+.project-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+.project-ref { font-size: 12px; font-weight: 700; color: var(--tc1, var(--accent)); margin-bottom: 7px; }
+.project-body h3 { font-size: 19px; margin-bottom: 8px; line-height: 1.25; }
+.project-body p {
+  color: var(--muted); font-size: 14px; margin: 0; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.project-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.tag {
+  font-size: 11.5px; font-weight: 500;
+  background: var(--bg-soft);
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+}
+.project-cta {
+  margin-top: 16px;
+  font-weight: 600; font-size: 14px;
+  color: var(--tc1, var(--accent));
+  display: flex; align-items: center; gap: 6px;
+  transition: gap 0.2s;
+}
+.project-card:hover .project-cta { gap: 11px; }
+
+/* ---- Skills ---- */
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+.skill-group {
+  background: var(--bg-soft);
+  border-radius: var(--r-md);
+  padding: 28px;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s;
+}
+.skill-group:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); background: var(--surface); }
+.skill-group h3 { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
+.skill-group h3::after {
+  content: "";
+  display: block;
+  width: 34px; height: 3px;
+  border-radius: 3px;
+  background: var(--grad);
+  margin-top: 10px;
+}
+.skill-group ul { list-style: none; margin: 0; padding: 0; }
+.skill-group li { font-size: 14.5px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.skill-group li:last-child { border-bottom: none; }
+
+/* ---- Interests ---- */
+.interests-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+.interest-card {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.interest-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.interest-thumb {
+  aspect-ratio: 4/3;
+  position: relative;
+  overflow: hidden;
+}
+.interest-thumb img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.interest-thumb video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  pointer-events: none;
+}
+.interest-card:hover .interest-thumb video { opacity: 1; }
+.interest-body { padding: 20px 22px 24px; }
+.interest-body h3 { font-size: 17px; margin-bottom: 8px; }
+.interest-body p { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.5; }
+
+/* ---- Contact ---- */
+.contact {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--contact-bg-2), var(--contact-bg));
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(2,132,199,0.38), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(6,182,212,0.30), transparent 45%),
+    linear-gradient(160deg, var(--contact-bg-2), var(--contact-bg));
+  color: #fff;
+  border-radius: var(--r-lg);
+  padding: clamp(48px, 6vw, 84px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+.contact > div { position: relative; z-index: 1; }
+.contact-wave-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.32;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.contact h2 { color: #fff; font-size: clamp(30px, 4vw, 44px); max-width: 16ch; }
+.contact p { color: #B4B7C4; margin-top: 16px; max-width: 42ch; font-size: 16.5px; }
+.contact-links { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.contact-links a {
+  font-size: 14.5px; font-weight: 500;
+  text-decoration: none; color: #fff;
+  background: rgba(255,255,255,0.08);
+  padding: 10px 18px;
+  border-radius: var(--r-full);
+  transition: background 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.contact-links a:hover { background: rgba(255,255,255,0.18); transform: translateX(-3px); }
+.contact-links svg { width: 17px; height: 17px; flex-shrink: 0; fill: currentColor; }
+
+/* ---- Footer ---- */
+footer {
+  padding: 36px 0 52px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+/* ---- Project detail pages ---- */
+.detail-hero { padding: 64px 0 48px; }
+.back-link {
+  font-size: 14px; font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 28px;
+  transition: color 0.2s, gap 0.2s;
+  cursor: pointer;
+  background: var(--bg-soft);
+  padding: 9px 18px;
+  border-radius: var(--r-full);
+  border: none;
+  font-family: var(--font-body);
+}
+.back-link:hover { color: var(--tc1, var(--accent)); gap: 10px; }
+.detail-hero h1 { font-size: clamp(32px, 5vw, 50px); max-width: 22ch; }
+.detail-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 32px; }
+.detail-meta div {
+  background: var(--bg-soft);
+  padding: 12px 20px;
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.detail-meta strong { display: block; font-size: 15px; font-weight: 700; color: var(--ink); }
+
+.detail-body { padding: 24px 0 64px; max-width: 780px; }
+.detail-body h2 { font-size: 23px; margin-top: 52px; margin-bottom: 18px; }
+.detail-body h2:first-child { margin-top: 0; }
+.detail-body p { font-size: 17px; margin: 0 0 18px; }
+
+.figure-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin: 30px 0; }
+.figure-grid.single { grid-template-columns: 1fr; }
+.figure { border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-md); background: var(--surface); }
+.figure-img {
+  aspect-ratio: 3/4;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 600;
+  text-align: center; padding: 20px;
+  position: relative;
+}
+.figure-img.wide { aspect-ratio: 4/3; }
+.figure-img.xwide { aspect-ratio: 16/9; }
+.figure-img.tall { aspect-ratio: 9/16; max-width: 340px; margin: 0 auto; }
+.figure-img img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.figure-img span { position: relative; z-index: 1; text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+.figure-cap { padding: 12px 16px; font-size: 13.5px; color: var(--muted); }
+
+.takeaway-box {
+  margin-top: 52px;
+  background: var(--tsoft, var(--accent-soft));
+  padding: 28px 32px;
+  border-radius: var(--r-md);
+  border-left: 4px solid var(--tc1, var(--accent));
+}
+.takeaway-box h2 { margin-top: 0; }
+
+.detail-nav {
+  border-top: 1px solid var(--line);
+  padding: 36px 0 64px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.detail-nav a {
+  text-decoration: none;
+  font-size: 14.5px; font-weight: 600;
+  color: var(--muted);
+  transition: color 0.2s;
+  cursor: pointer;
+  background: var(--bg-soft);
+  padding: 12px 22px;
+  border-radius: var(--r-full);
+}
+.detail-nav a:hover { color: var(--tc1, var(--accent)); }
+
+/* ---- Scroll reveal ---- */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ---- Responsive ---- */
+@media (max-width: 880px) {
+  .about-grid { grid-template-columns: 1fr; gap: 44px; }
+  .pcarousel { height: clamp(380px, 86vw, 440px); }
+  .figure-grid { grid-template-columns: 1fr; }
+  .contact { flex-direction: column; align-items: flex-start; }
+  .hero-stats { grid-template-columns: 1fr; }
+  section { padding: 72px 0; }
+}
+@media (max-width: 700px) {
+  .hero-glow { width: 320px; height: 320px; top: -140px; right: -120px; }
+  .hero-glow-2 { width: 320px; height: 320px; bottom: -160px; left: -140px; }
+  .eyebrow-full { display: none; }
+  .eyebrow-short { display: inline; }
+  .interest-thumb video { display: none; }
+  .nav-burger { display: flex; }
+  .nav-links {
+    display: flex;
+    position: absolute;
+    top: 72px; left: 0; right: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 12px var(--pad) 24px;
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: var(--shadow-md);
+  }
+  .nav-links.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .nav-links a { padding: 14px 16px; border-radius: var(--r-sm); }
+  .nav-cta { margin-left: 0; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav-logo" data-route="home"><span class="dot"></span> Jonathan Bourget</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a data-route="home" data-scroll="home">Home</a></li>
+      <li><a data-route="home" data-scroll="about">About</a></li>
+      <li><a data-route="home" data-scroll="projects">Projects</a></li>
+      <li><a data-route="home" data-scroll="skills">Skills</a></li>
+      <li><a data-route="home" data-scroll="contact">Contact</a></li>
+      <li><a href="assets/resume/Jonathan_Bourget_Resume.pdf" class="nav-cta" target="_blank">Resume</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme" type="button">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/></svg>
+    </button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ================================================================
+     PAGE: HOME
+     ================================================================ -->
+<main class="page active" id="page-home">
+
+  <section class="pin-section" id="home">
+    <div class="pin-sticky">
+      <video class="hero-video" id="heroVideo" src="assets/hero-bg.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-glow-2" aria-hidden="true"></div>
+
+      <div class="pin-layer pin-hero" id="pinHero">
+        <div class="pin-inner">
+          <div class="eyebrow">
+            <span class="eyebrow-full">🟢 Open to Co-op Opportunities — Spring/Summer 2027</span>
+            <span class="eyebrow-short">Open to Co-op — Summer 2027</span>
+          </div>
+          <h1>Hi, I'm <span class="grad-text">Jonathan</span>.</h1>
+          <div class="hero-actions">
+            <a class="btn btn-primary" data-route="home" data-scroll="projects">View My Projects</a>
+            <a class="btn btn-outline" data-route="home" data-scroll="contact">Get in Touch</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pin-layer pin-intro" id="pinIntro">
+        <!--
+        <div class="pin-icons">
+          <div class="pin-icon" style="width:54px; height:54px; top:4.5%; left:58.8%; opacity:0.14; color:rgb(124,58,237); transform:rotate(19deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 4 L22 9 L12 14 L2 9 Z"/><path d="M6 11 V17 Q12 20 18 17 V11"/><path d="M22 9 V15"/></svg>
+          </div>
+          <div class="pin-icon" style="width:56px; height:56px; top:5.9%; left:72.4%; opacity:0.14; color:rgb(124,58,237); transform:rotate(21deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg>
+          </div>
+          <div class="pin-icon" style="width:60px; height:60px; top:19.7%; left:63.5%; opacity:0.13; color:rgb(124,58,237); transform:rotate(-2deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12 H5 L7 7 L10 17 L13 7 L16 17 L19 7 L21 12 H23"/></svg>
+          </div>
+          <div class="pin-icon" style="width:42px; height:42px; top:69.5%; left:6.9%; opacity:0.12; color:rgb(124,58,237); transform:rotate(10deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 4 L22 9 L12 14 L2 9 Z"/><path d="M6 11 V17 Q12 20 18 17 V11"/><path d="M22 9 V15"/></svg>
+          </div>
+          <div class="pin-icon" style="width:52px; height:52px; top:72.2%; left:21.8%; opacity:0.15; color:rgb(124,58,237); transform:rotate(9deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/></svg>
+          </div>
+          <div class="pin-icon" style="width:59px; height:59px; top:83.9%; left:12.5%; opacity:0.12; color:rgb(124,58,237); transform:rotate(-27deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12 H5 L7 7 L10 17 L13 7 L16 17 L19 7 L21 12 H23"/></svg>
+          </div>
+        </div>
+        -->
+        <div class="pin-inner">
+          <p class="intro-statement-text"><span class="intro-line">I'm a <span class="grad-text">3rd-year Electrical Engineering</span> student at Carleton University.</span></p>
+        </div>
+      </div>
+
+      <div class="pin-layer pin-third" id="pinThird">
+        <!--
+        <div class="pin-icons">
+          <div class="pin-icon" style="width:47px; height:47px; top:2.9%; left:58.0%; opacity:0.14; color:rgb(217,119,6); transform:rotate(-10deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M9 7V3 M12 7V3 M15 7V3 M9 21V17 M12 21V17 M15 21V17 M7 9H3 M7 12H3 M7 15H3 M21 9H17 M21 12H17 M21 15H17"/></svg>
+          </div>
+          <div class="pin-icon" style="width:46px; height:46px; top:3.7%; left:73.2%; opacity:0.12; color:rgb(217,119,6); transform:rotate(1deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 017 0"/><path d="M5 12a10 10 0 0114 0"/><path d="M2 8.5a15 15 0 0120 0"/></svg>
+          </div>
+          <div class="pin-icon" style="width:42px; height:42px; top:18.7%; left:57.0%; opacity:0.16; color:rgb(217,119,6); transform:rotate(5deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20H21"/><rect x="5" y="14" width="3" height="6"/><rect x="10.5" y="10" width="3" height="10"/><rect x="16" y="5" width="3" height="15"/></svg>
+          </div>
+          <div class="pin-icon" style="width:42px; height:42px; top:19.4%; left:71.7%; opacity:0.14; color:rgb(217,119,6); transform:rotate(-16deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3V21"/><path d="M17 7C17 7 15.5 5.5 12.5 5.5C9.5 5.5 8 7 8 9C8 11 10 12 12 12C14 12 16 13 16 15C16 17 14.5 18.5 11.5 18.5C8.5 18.5 7 17 7 17"/></svg>
+          </div>
+          <div class="pin-icon" style="width:40px; height:40px; top:67.3%; left:5.9%; opacity:0.12; color:rgb(217,119,6); transform:rotate(-5deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M9 7V3 M12 7V3 M15 7V3 M9 21V17 M12 21V17 M15 21V17 M7 9H3 M7 12H3 M7 15H3 M21 9H17 M21 12H17 M21 15H17"/></svg>
+          </div>
+          <div class="pin-icon" style="width:49px; height:49px; top:69.3%; left:22.2%; opacity:0.15; color:rgb(217,119,6); transform:rotate(24deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/><path d="M8.5 15.5a5 5 0 017 0"/><path d="M5 12a10 10 0 0114 0"/><path d="M2 8.5a15 15 0 0120 0"/></svg>
+          </div>
+          <div class="pin-icon" style="width:46px; height:46px; top:83.9%; left:6.9%; opacity:0.14; color:rgb(217,119,6); transform:rotate(0deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20H21"/><rect x="5" y="14" width="3" height="6"/><rect x="10.5" y="10" width="3" height="10"/><rect x="16" y="5" width="3" height="15"/></svg>
+          </div>
+          <div class="pin-icon" style="width:62px; height:62px; top:84.5%; left:19.0%; opacity:0.13; color:rgb(217,119,6); transform:rotate(10deg);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3V21"/><path d="M17 7C17 7 15.5 5.5 12.5 5.5C9.5 5.5 8 7 8 9C8 11 10 12 12 12C14 12 16 13 16 15C16 17 14.5 18.5 11.5 18.5C8.5 18.5 7 17 7 17"/></svg>
+          </div>
+        </div>
+        -->
+        <div class="pin-inner">
+          <p class="intro-statement-text"><span class="intro-line">I'm passionate about <span class="grad-text">electronics and hardware</span>, wireless systems, and even finance and investing.</span></p>
+        </div>
+      </div>
+
+      <div class="hero-unpin-fade" id="heroUnpinFade" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap about-grid">
+      <div class="about-copy reveal">
+        <div class="eyebrow">About Me</div>
+        <h2>A bit about myself</h2>
+        <p>Before I was building circuits, I was a certified lifeguard, swim instructor, and first aid instructor with the City of Ottawa, and a volunteer coach for competitive speed skaters. Those roles taught me the same lesson twice: stay calm under pressure, document everything properly, and take responsibility when it counts.</p>
+        <p>That mindset carries into how I approach engineering. I like taking an idea from a rough sketch to something that actually works. Most of my projects come down to the same cycle: build it, test it until it breaks (I like that part more than I probably should), figure out why, and fix it properly. I am always curious to learn about new technology and have recently developed an interest in RF systems and where AI is headed, especially AI implementation and use cases, which I am hoping to incorporate into some of my future projects.</p>
+        <p>I'm always open to co-op opportunities, conversations with other engineers, or just learning how things actually work and get done in the real-world.</p>
+      </div>
+
+      <div class="carousel reveal" id="aboutCarousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide grad-1">
+            <img src="assets/images/about-1.jpg" alt="Lifeguarding">
+          </div>
+          <div class="carousel-slide grad-2">
+            <img src="assets/images/about-2.JPEG" alt="Workbench">
+          </div>
+          <div class="carousel-slide grad-3">
+            <img src="assets/images/about-3.JPEG" alt="Roof Lighting Project">
+          </div>
+          <div class="carousel-slide grad-4">
+            <video src="assets/images/about-4.MP4" autoplay muted loop playsinline></video>
+          </div>
+           <div class="carousel-slide grad-5">
+            <img src="assets/images/about-5.JPEG" alt="Nexys FPGA Learning Project">
+          </div>
+        </div>
+        <button class="carousel-arrow prev" id="carouselPrev" aria-label="Previous photo">‹</button>
+        <button class="carousel-arrow next" id="carouselNext" aria-label="Next photo">›</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" style="background:var(--bg-soft);">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <div class="eyebrow">Projects</div>
+        <h2>Check out my builds!</h2>
+        <p>A growing list of different challenges that I tackled - click any card for the full story, photos, and what went wrong along the way.</p>
+      </div>
+    </div>
+    <div class="pcarousel-stage">
+      <div class="pcarousel" id="projCarousel">
+        <div class="pcarousel-track" id="projTrack">
+
+          <a class="project-card theme-blue" data-route="pcb" data-idx="0" tabindex="0">
+            <div class="project-thumb">
+              <img src="assets/images/project-pcb-cover.JPEG" alt="Modular Bicycle Lighting System">
+            </div>
+            <div class="project-body">
+              <div class="project-ref">PROJ-01</div>
+              <h3>Modular Bicycle Lighting System</h3>
+              <p>Designed and built a weatherproof RGBW lighting system for bicycles.</p>
+              <div class="project-tags">
+                <span class="tag">EasyEDA</span><span class="tag">PCB Design</span><span class="tag">C++ / Arduino</span><span class="tag">CAD + 3D Print</span>
+              </div>
+              <div class="project-cta">View Project →</div>
+            </div>
+          </a>
+
+         <a class="project-card theme-red" data-route="gokart" data-idx="1" tabindex="0">
+            <div class="project-thumb">
+              <img src="assets/images/project-gokart-cover.JPG" alt="Electric Go-Kart">
+            </div>
+            <div class="project-body">
+              <div class="project-ref">PROJ-02</div>
+              <h3>Electric Go-Kart</h3>
+              <p>Built a 1.6kW electric go-kart from a welded steel frame.</p>
+              <div class="project-tags">
+                <span class="tag">Three-Phase Systems</span><span class="tag">Motor Control</span><span class="tag">Metal Working</span><span class="tag">Fabrication</span>
+              </div>
+              <div class="project-cta">View Project →</div>
+            </div>
+          </a>
+
+         <a class="project-card theme-green" data-route="rcplane" data-idx="2" tabindex="0">
+            <div class="project-thumb">
+              <img src="assets/images/project-rcplane-cover.JPEG" alt="C-130 Autonomous RC Drone">
+            </div>
+            <div class="project-body">
+              <div class="project-ref">PROJ-03</div>
+              <h3>C-130 Autonomous RC Drone</h3>
+              <p>Building the flight controller and RF system for an autonomous RC drone.</p>
+              <div class="project-tags">
+                <span class="tag">Drone Control</span><span class="tag">Communications</span><span class="tag">Signal Processing</span><span class="tag">Component Selection</span><span class="tag">RF</span>
+              </div>
+              <div class="project-cta">View Project →</div>
+            </div>
+          </a>
+           
+          <a class="project-card theme-amber" data-route="mosfet" data-idx="3" tabindex="0">
+            <div class="project-thumb">
+              <img src="assets/images/project-mosfet-cover.JPEG" alt="MOSFET x Off-Road System">
+            </div>
+            <div class="project-body">
+              <div class="project-ref">PROJ-04</div>
+              <h3>MOSFET x Off-Road System </h3>
+              <p>Integrated high-power LED lighting into a vehicle using MOSFET switching.</p>
+              <div class="project-tags">
+                <span class="tag">MOSFETs</span><span class="tag">Power Electronics</span><span class="tag">Heat Dissipation</span><span class="tag">Circuit Design</span><span class="tag">Automotive Electronics</span>
+              </div>
+              <div class="project-cta">View Project →</div>
+            </div>
+          </a>
+
+          <a class="project-card theme-purple" data-route="aiagent" data-idx="4" tabindex="0">
+            <div class="project-thumb">
+              <img src="assets/images/project-aiagent-cover.png" alt="Custom AI Agent Secretary">
+            </div>
+            <div class="project-body">
+              <div class="project-ref">PROJ-05</div>
+              <h3>AI Agent Secretary</h3>
+              <p>Customized a personal AI agent to automate everyday tasks through the Hermes framework.</p>
+              <div class="project-tags">
+                <span class="tag">AI / LLM</span><span class="tag">Token Mechanics</span><span class="tag">Automation</span><span class="tag">APIs</span><span class="tag">Powershell</span>
+              </div>
+              <div class="project-cta">View Project →</div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+      <div class="pcarousel-controls">
+        <button class="pcarousel-arrow" id="projPrev" aria-label="Previous project">‹</button>
+        <div class="pcarousel-dots" id="projDots"></div>
+        <button class="pcarousel-arrow" id="projNext" aria-label="Next project">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <div class="eyebrow">Skills</div>
+        <h2>Tools &amp; technical proficiencies</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-group reveal">
+          <h3>Design &amp; Fabrication</h3>
+          <ul><li>Altium Designer</li><li>EasyEDA</li><li>Autodesk Fusion CAD</li><li>Soldering &amp; Rework</li><li>Component Selection</li><li>3D Printing &amp; Prototyping</li><li>Breadboarding</li></ul>
+        </div>
+        <div class="skill-group reveal">
+          <h3>Programming &amp; Firmware</h3>
+          <ul><li>C / C++</li><li>Verilog HDL</li><li>Python</li><li>Java</li><li>Git Version Control</li></ul>
+        </div>
+        <div class="skill-group reveal">
+          <h3>Test, Simulation &amp; Platforms</h3>
+          <ul><li>Arduino</li><li>Raspberry Pi</li><li>FPGA</li><li>Oscilloscope / Multimeter</li><li>NI Multisim</li><li>Vivado</li><li>Jupyter Notebook</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interests">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <div class="eyebrow">Interests</div>
+        <h2>What I'm keeping an eye on</h2>
+      </div>
+      <div class="interests-grid">
+        <div class="interest-card reveal">
+          <div class="interest-thumb grad-2">
+            <img src="assets/images/interest-robotics.jpg" alt="Cutting-edge robotics">
+            <video src="assets/images/interest-robotics.mp4" muted loop playsinline preload="metadata"></video>
+          </div>
+          <div class="interest-body">
+            <h3>Cutting-Edge Robotics</h3>
+            <p>Legged and humanoid robots closing the gap between lab demos and real-world deployment.</p>
+          </div>
+        </div>
+        <div class="interest-card reveal">
+          <div class="interest-thumb grad-4">
+            <img src="assets/images/interest-rf.jpg" alt="RF and space communications">
+            <video src="assets/images/interest-rf.mp4" muted loop playsinline preload="metadata"></video>
+          </div>
+          <div class="interest-body">
+            <h3>RF &amp; Space Communications</h3>
+            <p>From 6G to satellite constellations, wireless keeps getting more ambitious.</p>
+          </div>
+        </div>
+        <div class="interest-card reveal">
+          <div class="interest-thumb grad-5">
+            <img src="assets/images/interest-ai.jpg" alt="AI and AGI datacenter">
+            <video src="assets/images/interest-ai.mp4" muted loop playsinline preload="metadata"></video>
+          </div>
+          <div class="interest-body">
+            <h3>AI &amp; the Road to AGI</h3>
+            <p>Where automation stops assisting and starts actually thinking for itself.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact reveal">
+        <canvas class="contact-wave-canvas" id="contactWave" aria-hidden="true"></canvas>
+        <div>
+          <div class="eyebrow" style="background:rgba(255,255,255,0.1); color:#fff;">Contact</div>
+          <h2>Let's build something.</h2>
+          <p>I'm currently looking for a 2027 Summer co-op placement. Always happy to talk about a project, a role, or just electronics and technology in general.</p>
+          <div style="margin-top:28px;">
+            <a href="mailto:jon.m.bourget@gmail.com" class="btn btn-primary">Email Me</a>
+          </div>
+        </div>
+        <div class="contact-links">
+          <a href="mailto:jon.m.bourget@gmail.com">
+            <svg viewBox="0 0 24 24"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 18.5v-13Zm2.2.3 7.3 6.1a.8.8 0 0 0 1 0l7.3-6.1a.6.6 0 0 0-.4-1H4.6a.6.6 0 0 0-.4 1ZM4 8.1v10.4c0 .3.2.5.5.5h15c.3 0 .5-.2.5-.5V8.1l-7.1 5.9a2.8 2.8 0 0 1-3.6 0L4 8.1Z"/></svg>
+            jon.m.bourget@gmail.com
+          </a>
+          <a href="https://www.linkedin.com/in/jonathan-bourget-8a4038255" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M6.94 5a2 2 0 1 1-4-.02 2 2 0 0 1 4 .02ZM7 8.48H3V21h4V8.48Zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-3.96 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.68-2.91V8.48Z"/></svg>
+            LinkedIn ↗
+          </a>
+          <a href="assets/resume/Jonathan_Bourget_Resume.pdf" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 1 1v9.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V4a1 1 0 0 1 1-1ZM5 19a1 1 0 0 0 1 1h12a1 1 0 1 0 0-2H6a1 1 0 0 0-1 1Z"/></svg>
+            Download Resume ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================================================================
+     PAGE: PCB LIGHTING PROJECT
+     ================================================================ -->
+<main class="page theme-blue" id="page-pcb">
+  <div class="wrap">
+    <header class="detail-hero">
+      <a class="back-link" data-route="home" data-scroll="projects">← Back to projects</a>
+      <div class="eyebrow">PROJ-01</div>
+      <h1>Modular Bicycle Lighting System</h1>
+      <div class="detail-meta">
+        <div><strong>2022</strong>Timeline</div>
+        <div><strong>Solo Project</strong>Role</div>
+      </div>
+    </header>
+
+    <div class="detail-body">
+      <h2>The Idea</h2>
+      <p>I created a PCB layout for a personal project of mine. The aim was to build a novel, programmable, and controllable RGBW lighting system for my bicycle and electric scooter. The intention was to potentially commercialize the final product, since I felt there weren't any options on the market providing the same functionality.</p>
+
+      <h2>Prototyping the Idea</h2>
+      <p>I initially started prototyping with raw wires and generic component boxes. Over a few iterations, I added and removed certain additional functionality, like chimes and signal clicks, along the way once I decided they were unnecessary.</p>
+      <div class="figure-grid">
+        <figure class="figure">
+          <div class="figure-img grad-1">
+          <img src="assets/images/prototype-v1.JPEG" alt="prototype v1"></div>
+          <figcaption class="figure-cap">Fig. 1 — Layout V1, first prototype</figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="figure-img grad-2">
+          <img src="assets/images/prototype-v2.JPEG" alt="prototype v2"></div>
+          <figcaption class="figure-cap">Fig. 2 — Layout V2, compact circuit</figcaption>
+        </figure>
+      </div>
+
+      <h2>Designing the PCB</h2>
+      <p>I designed the PCB in EasyEDA to support the control module (an Arduino Nano) and have all the required connections in functional locations for final assembly. This was based on the circuit layout I developed during the prototyping phase. The process involved learning how to use the PCB design interface and researching best practices for vias and hole tolerances for various components. It was useful to cross-reference by measuring pin diameters with a precision caliper at home to make sure no major mistakes were being made.</p>
+      <div class="figure-grid">
+        <figure class="figure">
+          <div class="figure-img grad-3">
+          <img src="assets/images/pcb-raw.JPEG" alt="pcb raw"></div>
+          <figcaption class="figure-cap">Fig. 3 — Raw PCB as received</figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="figure-img grad-4">
+          <img src="assets/images/pcb-populated.JPEG" alt="pcb populated"></div>
+          <figcaption class="figure-cap">Fig. 4 — Components being added</figcaption>
+        </figure>
+      </div>
+
+      <h2>Assembly &amp; Testing</h2>
+      <p>Before combining everything with the 3D printed casings, I ran the assembly through a couple of testing phases. The first pass was missing the physical switches, which I simulated with keystrokes on the Arduino-connected laptop while programming. That stage also included soldering the Adafruit NeoPixel strip boards onto the outer portion of the pixel design. The final circuit shown below includes the real switches and was tested exactly as it would be used on the bike.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-2 wide">
+          <img src="assets/images/final-circuit.JPEG" alt="final circuit"></div>
+          <figcaption class="figure-cap">Fig. 5 — Final circuit assembly on PCB</figcaption>
+        </figure>
+      </div>
+
+      <h2>Hardware &amp; Mounting</h2>
+      <p>Next, I needed to make sure the system was weatherproof for rainy days and outdoor storage. I designed three different casing models in CAD and 3D printed them for front, rear, and a compact version aimed at scooters or racing bikes. The circular case uses the same PCB as the linear one, though the connections for the side NeoPixel strips are simply left unused on that version.</p>
+      <p>The design was originally meant to be easy to construct and produce, simple and scalable enough to sell at a reasonably competitive price. I never ended up trying to sell any, mainly due to cost and manufacturing time, even though the final design came close to being a finished product.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-3 wide">
+          <img src="assets/images/casings.JPEG" alt="casings"></div>
+          <figcaption class="figure-cap">Fig. 6 — Different casing designs (front, rear, compact)</figcaption>
+        </figure>
+      </div>
+
+      <div class="takeaway-box">
+        <h2>Summary and Takeaways</h2>
+        <p>Overall, I really enjoyed working on this project since it gave me immediate, practical benefits: having programmable lighting while biking at night. I was able to take the idea from concept to a final product and made significant improvements in durability and reliability along the way. I also enjoyed working with online development environments and making all of the decisions (and mistakes) that came with PCB and CAD design as a first-time solo designer.</p>
+      </div>
+    </div>
+
+    <div class="detail-nav">
+      <a data-route="home" data-scroll="projects">← All projects</a>
+      <a data-route="gokart">Next: Electric Go-Kart →</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================================================================
+     PAGE: MOSFET PROJECT
+     ================================================================ -->
+<main class="page theme-amber" id="page-mosfet">
+  <div class="wrap">
+    <header class="detail-hero">
+      <a class="back-link" data-route="home" data-scroll="projects">← Back to projects</a>
+      <div class="eyebrow">PROJ-04</div>
+      <h1>MOSFET/Arduino Integration for Vehicle Lighting</h1>
+      <div class="detail-meta">
+        <div><strong>2025</strong>Timeline</div>
+        <div><strong>Solo Project</strong>Role</div>
+      </div>
+    </header>
+
+    <div class="detail-body">
+      <h2>The Problem</h2>
+      <p>Earlier this year, I wanted to retrofit some high-powered LED lights onto the roof rack of my vehicle. I researched ways to connect this system to an existing Arduino I already had installed in my dash for modular projects like this. I settled on using MOSFET components to act as quick-response relays for flash patterns, connecting the system to a switched fusebox source through the MOSFETs. The whole system is button-controlled via the Arduino, since using a microcontroller let me build more complex rapid flash patterns based on button presses and switch sequences.</p>
+
+      <h2>Initial Design</h2>
+      <p>I first designed a rough draft of the circuit on paper based on my research into MOSFETs and Arduino pin control. This served as a template for prototyping the circuit.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-1 xwide">
+          <img src="assets/images/hand-sketch.JPG" alt="hand sketch"></div>
+          <figcaption class="figure-cap">Fig. 1 — Hand-drawn sketch of wiring and plan</figcaption>
+        </figure>
+      </div>
+
+      <h2>Prototyping &amp; Testing</h2>
+      <p>I assembled the design on a breadboard and tested it with a modular power supply to make sure there wouldn't be any issues with overloading or heat dissipation once it was fully installed on the car.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-2 wide">
+          <img src="assets/images/installed-lights.JPEG" alt="installed lights"></div>
+          <figcaption class="figure-cap">Fig. 2 — Final install, static yellow mode</figcaption>
+        </figure>
+      </div>
+      <p>This project still serves me during the summer months, and I've since tweaked the design to be more easily removable with modular weatherproof connectors that I soldered onto both the car wiring outputs and the roof rack connections.</p>
+
+      <div class="takeaway-box">
+        <h2>Summary and Takeaways</h2>
+        <p>With this project I gained valuable hands-on experience designing and building a practical electronics system for my car. It involved learning to design a control system using an Arduino to manage the high-power LED lights and create custom flash patterns. I developed skills in power electronics and interfacing by selecting, testing, and implementing MOSFETs, which turned out to be the best option for my goals. A major takeaway was around prototyping and quality assurance: I started with a rough sketch, built it on a breadboard, and tested it extensively to make sure the components wouldn't overheat or fail in a real-world automotive setting, with internal vehicle temperatures ranging anywhere from -35°C to 40°C in worst-case scenarios. I also learned how to handle automotive electrical systems by safely wiring the finished circuit into the vehicle's existing fusebox with the proper fuses and load resistors.</p>
+      </div>
+    </div>
+
+    <div class="detail-nav">
+      <a data-route="rcplane">← C-130 Autonomous RC Drone</a>
+      <a data-route="aiagent">Next: AI Agent Secretary →</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================================================================
+     PAGE: GO-KART PROJECT
+     ================================================================ -->
+<main class="page theme-red" id="page-gokart">
+  <div class="wrap">
+    <header class="detail-hero">
+      <a class="back-link" data-route="home" data-scroll="projects">← Back to projects</a>
+      <div class="eyebrow">PROJ-02</div>
+      <h1>Electric Go-Kart</h1>
+      <div class="detail-meta">
+        <div><strong>2019</strong>Timeline</div>
+        <div><strong>2-Person Team</strong>Role</div>
+      </div>
+    </header>
+
+    <div class="detail-body">
+      <h2>The Idea</h2>
+      <p>An earlier project of mine was inspired by Formula One, when a friend and I wanted to take on the challenge of building a soapbox racing kart just for fun. It quickly evolved into a fully-fledged 1.6kW powered metal machine and taught me a lot about three-phase motor control and manufacturing.</p>
+
+      <h2>Frame</h2>
+      <p>The frame was initially planned out using wood beams cut to size, to check the size and maneuverability of a simple rectangular box with bracing. Once the design was proven to work conceptually, the whole kart was cut from rounded square box-section steel with sheet metal for the flooring. With limited tooling, this proved to be a real challenge even with careful measurement. You can see the repurposed kid's bike wheel below, standing in as a makeshift steering wheel while we tested rolling resistance and steering angles.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-3">
+          <img src="assets/images/frame-assembly.JPEG" alt="frame assembly"></div>
+          <figcaption class="figure-cap">Fig. 1 — Mostly assembled frame (with a repurposed kid's bike wheel standing in as the steering wheel during testing)</figcaption>
+        </figure>
+      </div>
+
+      <h2>Power System &amp; Electronics</h2>
+      <p>The power system consisted of four 12V lead-acid batteries, generally used for emergency lighting systems, wired in series. These provided the necessary voltage to the 1.6kW-rated motor controller. The motor is normally used for large garage door mechanisms or electric outboard motors for boats, but the mounting plate and torque ratings made it a good fit for this application. The gear ratio was chosen for low-speed pickup and rougher terrain use, since it multiplied the torque almost tenfold. That meant the real challenge became keeping the motor running near its max RPM and current rating for any mid to high-speed cruising at that gear ratio, and we ran into plenty of issues with chain tensioning and brackets bending under heavy acceleration.</p>
+      <div class="figure-grid">
+        <figure class="figure">
+          <div class="figure-img grad-4">
+          <img src="assets/images/battery-pack.JPEG" alt="battery pack"></div>
+          <figcaption class="figure-cap">Fig. 2 — Assembled battery pack</figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="figure-img grad-1">
+          <img src="assets/images/motor-assembly.JPEG" alt="motor assembly"></div>
+          <figcaption class="figure-cap">Fig. 3 — Motor assembly</figcaption>
+        </figure>
+      </div>
+      <p>I ended up having to research and swap out the actuator pedal for the motor controller so it had a larger analog travel range. The original one was nearly impossible to map into smooth RPM increase, even with a lot of practice, and since there was no way to reprogram the controller itself, replacing the pedal was the easiest fix for the jerky acceleration.</p>
+
+      <h2>Final Result</h2>
+      <p>With the electronic controls in place and some torque and power delivery optimizations, my friend managed to hit 49 km/h in a straight-line test on paved road, not bad for a build carrying a 200+ lb driver. Under more regular use, like cruising around neighborhoods and parks, the 15 Ah battery pack gave us 3 to 5 hours of stop-and-go runtime. We looked into adding regenerative braking to recharge the battery as a generator, but it quickly became clear the extra three-phase battery control hardware needed would blow past our budget.</p>
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-2">
+          <img src="assets/images/final-gokart.JPEG" alt="final gokart"></div>
+          <figcaption class="figure-cap">Fig. 4 — Final construction</figcaption>
+        </figure>
+      </div>
+
+      <div class="takeaway-box">
+        <h2>Summary and Takeaways</h2>
+        <p>The Go-Kart project was one of the first times I combined my interest in mechanical design and fabrication with my fascination for electronics and electrical systems. It took a lot of labour to put together, but it was well worth it. Troubleshooting the throttle sensitivity and power delivery issues taught me a lot about trial-and-error problem solving, and it's honestly the project that pointed me toward electrical engineering in the first place.</p>
+      </div>
+    </div>
+
+    <div class="detail-nav">
+      <a data-route="pcb">← Modular Bicycle Lighting</a>
+      <a data-route="rcplane">Next: C-130 Autonomous RC Drone →</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================================================================
+     PAGE: RC AIRPLANE PROJECT
+     ================================================================ -->
+<main class="page theme-green" id="page-rcplane">
+  <div class="wrap">
+    <header class="detail-hero">
+      <a class="back-link" data-route="home" data-scroll="projects">← Back to projects</a>
+      <div class="eyebrow">PROJ-03</div>
+      <h1>C-130 Autonomous RC Drone</h1>
+      <div class="detail-meta">
+        <div><strong>Ongoing</strong>Timeline</div>
+        <div><strong>Electronics Team</strong>Role</div>
+      </div>
+    </header>
+
+    <div class="detail-body">
+      <h2>The Project</h2>
+      <p>I'll be joining the electronics subteam on the C-130 autonomous RC drone build. Our subteam is four people, including me, working within a larger project team of around eight to nine people total. My focus is on designing the flight controller around an STM32, the RF transmission and reception system, and some basic GPS and autonomous flight capability.</p>
+
+      <div class="takeaway-box">
+        <h2>Looking Ahead</h2>
+        <p>This project is still early, so a lot of the specific component choices and architecture decisions are still ahead of us. The first concrete deliverable will be a full bill of materials, which I'll add here as a photo once it's finalized. From there, I'm hoping to also share some of the flight controller code on GitHub and, if the timeline allows, a 3D model of the PCB itself.</p>
+      </div>
+    </div>
+
+    <div class="detail-nav">
+      <a data-route="gokart">← Electric Go-Kart</a>
+      <a data-route="mosfet">Next: MOSFET x Off-Road System →</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================================================================
+     PAGE: AI AGENT PROJECT
+     ================================================================ -->
+<main class="page theme-purple" id="page-aiagent">
+  <div class="wrap">
+    <header class="detail-hero">
+      <a class="back-link" data-route="home" data-scroll="projects">← Back to projects</a>
+      <div class="eyebrow">PROJ-05</div>
+      <h1>AI Agent Secretary</h1>
+      <div class="detail-meta">
+        <div><strong>2026</strong>Timeline</div>
+        <div><strong>Solo Project</strong>Role</div>
+      </div>
+    </header>
+
+    <div class="detail-body">
+      <h2>Overview</h2>
+      <p>I installed and configured Hermes, a self-hosted AI agent that operates through existing LLM providers' API keys, setting up its plugins and markdown configuration files to fit the tasks I actually wanted automated day to day. As a first real use case, I interfaced the Yahoo Finance and Telegram APIs to build a simple daily investment update: the agent checks my watchlist each day and sends a summary straight to Telegram with a detailed prompt response outlining market movements, geopolitical events, key dates and things to watch for as well as daily changes and sector movements.</p>
+
+      <div class="figure-grid single">
+        <figure class="figure">
+          <div class="figure-img grad-2 tall">
+          <img src="assets/images/agent-demo.PNG" alt="agent demo"></div>
+          <figcaption class="figure-cap">Fig. 1 — Agent in action</figcaption>
+        </figure>
+      </div>
+
+      <div class="takeaway-box">
+        <h2>Looking Ahead</h2>
+        <p>This is an early, ongoing project. I'm looking to build out more automations as I find genuinely useful daily tasks worth handing off to it.</p>
+      </div>
+    </div>
+
+    <div class="detail-nav">
+      <a data-route="mosfet">← MOSFET x Off-Road System</a>
+      <a data-route="home" data-scroll="projects">All projects →</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Jonathan Bourget</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ROUTING — hash-based single-file pages
+   Routes: #home (default), #pcb, #mosfet, #gokart
+   ============================================================ */
+const routes = ['home', 'pcb', 'mosfet', 'gokart', 'rcplane', 'aiagent'];
+
+function showPage(route, scrollTarget) {
+  if (!routes.includes(route)) route = 'home';
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + route);
+  if (page) page.classList.add('active');
+
+  // Update hash without triggering hashchange loop
+  const newHash = '#' + route;
+  if (location.hash !== newHash) {
+    history.pushState(null, '', newHash);
+  }
+
+  // Scroll: either to a section (home page) or to top (project pages)
+  requestAnimationFrame(() => {
+    if (scrollTarget) {
+      const el = document.getElementById(scrollTarget);
+      if (el) { el.scrollIntoView({ behavior: 'smooth' }); return; }
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  });
+
+  // Re-observe reveal elements on the newly shown page
+  initReveals(page);
+
+  // Re-center the project carousel when returning home (it can't
+  // measure widths while hidden)
+  if (route === 'home' && window.recenterProjCarousel) {
+    requestAnimationFrame(window.recenterProjCarousel);
+  }
+}
+
+// Wire up all elements with data-route
+document.querySelectorAll('[data-route]').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    showPage(el.dataset.route, el.dataset.scroll || null);
+    closeMobileNav();
+  });
+});
+
+// Handle back/forward buttons and direct hash links
+function routeFromHash() {
+  const route = location.hash.replace('#', '') || 'home';
+  showPage(routes.includes(route) ? route : 'home');
+}
+window.addEventListener('popstate', routeFromHash);
+
+/* ============================================================
+   MOBILE NAV
+   ============================================================ */
+const navBurger = document.getElementById('navBurger');
+const navLinks = document.getElementById('navLinks');
+
+function closeMobileNav() {
+  navLinks.classList.remove('open');
+  navBurger.setAttribute('aria-expanded', 'false');
+}
+
+navBurger.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  navBurger.setAttribute('aria-expanded', isOpen);
+});
+
+/* ============================================================
+   THEME TOGGLE — light / dark, persisted to localStorage
+   ============================================================ */
+const themeToggle = document.getElementById('themeToggle');
+function setThemeLabel(theme) {
+  themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+}
+setThemeLabel(document.documentElement.getAttribute('data-theme') || 'light');
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  setThemeLabel(next);
+  try { localStorage.setItem('theme', next); } catch (e) {}
+});
+
+/* ============================================================
+   CAROUSEL — arrows, dots, autoplay, swipe
+   ============================================================ */
+const track = document.getElementById('carouselTrack');
+const dotsWrap = document.getElementById('carouselDots');
+const carouselEl = document.getElementById('aboutCarousel');
+
+if (track && dotsWrap) {
+  const slides = Array.from(track.children);
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.setAttribute('aria-label', 'Go to photo ' + (i + 1));
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => { goTo(i); });
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function goTo(index) {
+    current = (index + slides.length) % slides.length;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  document.getElementById('carouselNext').addEventListener('click', () => { next(); });
+  document.getElementById('carouselPrev').addEventListener('click', () => { prev(); });
+
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 40) { diff < 0 ? next() : prev(); }
+  }, { passive: true });
+}
+
+/* ============================================================
+   PROJECT DECK — cards sit on a shallow arc. Whichever card is
+   "active" (the resting pick) sits dead centre, upright, frontmost;
+   every other card's position is computed relative to it. Navigation
+   is deliberately arrows + dots only — no hover sweep, no drag —
+   the most predictable, no-surprises way to browse it.
+   ============================================================ */
+const projTrack = document.getElementById('projTrack');
+const projDots = document.getElementById('projDots');
+const projCarousel = document.getElementById('projCarousel');
+
+if (projTrack && projDots) {
+  const cards = Array.from(projTrack.children);
+  // Visual spacing between fanned cards (the stage is wide, like the hero,
+  // so cards spread out further apart).
+  const SLOT_SPACING = 130;
+  let pIndex = Math.floor((cards.length - 1) / 2);
+
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.setAttribute('aria-label', 'Bring project ' + (i + 1) + ' to the front');
+    dot.addEventListener('click', () => pGoTo(i));
+    projDots.appendChild(dot);
+  });
+  const pDots = Array.from(projDots.children);
+
+  function spreadForWidth() {
+    const w = projCarousel.offsetWidth;
+    return Math.max(0.55, Math.min(1, w / 1100));
+  }
+
+  function updateDeck() {
+    const mult = spreadForWidth();
+
+    cards.forEach((card, i) => {
+      const offset = i - pIndex;
+      const absOffset = Math.min(Math.abs(offset), 3);
+      const x = offset * SLOT_SPACING * mult;
+      const y = absOffset * 16 * mult;
+      const rot = offset * 7.5;
+      const scale = 1 - absOffset * 0.065;
+      const z = 50 - Math.abs(offset);
+
+      card.style.transform =
+        'translate(-50%,-50%) translate(' + x + 'px,' + y + 'px) rotate(' + rot + 'deg) scale(' + scale + ')';
+      card.style.zIndex = Math.round(z + 100);
+    });
+
+    pDots.forEach((d, i) => d.classList.toggle('active', i === pIndex));
+
+    // Tint the active dot with the front card's own theme colors instead
+    // of the site-wide accent, so the index matches whatever's on screen.
+    const frontCard = cards[pIndex];
+    if (frontCard) {
+      const cs = getComputedStyle(frontCard);
+      const tc1 = cs.getPropertyValue('--tc1').trim();
+      const tc2 = cs.getPropertyValue('--tc2').trim();
+      if (tc1) projDots.style.setProperty('--dot-tc1', tc1);
+      if (tc2) projDots.style.setProperty('--dot-tc2', tc2);
+    }
+  }
+
+  function pGoTo(index) {
+    pIndex = Math.max(0, Math.min(index, cards.length - 1));
+    updateDeck();
+  }
+
+  document.getElementById('projNext').addEventListener('click', () => pGoTo(pIndex + 1));
+  document.getElementById('projPrev').addEventListener('click', () => pGoTo(pIndex - 1));
+
+  cards.forEach((card, i) => {
+    // Focusing (keyboard) or clicking a card makes it the deck's resting
+    // pick, so it's still centred like this if the visitor comes back.
+    card.addEventListener('focus', () => pGoTo(i));
+    card.addEventListener('click', () => { pIndex = i; });
+  });
+
+  window.addEventListener('resize', updateDeck);
+
+  // Let the router refresh sizing when the home page becomes visible again
+  window.recenterProjCarousel = updateDeck;
+
+  requestAnimationFrame(updateDeck);
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+function initReveals(scope) {
+  (scope || document).querySelectorAll('.reveal:not(.in)').forEach((el, i) => {
+    el.style.transitionDelay = Math.min(i % 4, 3) * 0.08 + 's';
+    revealObserver.observe(el);
+  });
+}
+
+/* ============================================================
+   INTEREST CARD HOVER VIDEOS
+   ============================================================ */
+document.querySelectorAll('.interest-card').forEach(card => {
+  const video = card.querySelector('video');
+  if (!video) return;
+
+  card.addEventListener('mouseenter', () => {
+    if (getComputedStyle(video).display === 'none') return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  });
+  card.addEventListener('mouseleave', () => {
+    video.pause();
+  });
+});
+
+/* ============================================================
+   PINNED HERO CROSSFADE
+   ============================================================ */
+const pinSection = document.getElementById('home');
+const pinSticky = document.querySelector('.pin-sticky');
+const pinHero = document.getElementById('pinHero');
+const pinIntro = document.getElementById('pinIntro');
+const pinThird = document.getElementById('pinThird');
+const heroUnpinFade = document.getElementById('heroUnpinFade');
+const heroVideo = document.getElementById('heroVideo');
+const navEl = document.querySelector('.nav');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (pinSection && pinSticky && pinHero && pinIntro && pinThird && heroUnpinFade && !prefersReducedMotion) {
+  let ticking = false;
+  let navHeight = 72;
+  let stickyHeight = 0;
+  let pinStart = 0;   // document scrollY where pinning begins
+  let pinEnd = 0;     // document scrollY where pinning ends
+
+  // Scroll-attached video: once metadata is known, hand playback control
+  // over to scroll position instead of the browser's own clock.
+  let videoDuration = 0;
+  let videoScrubReady = false;
+  if (heroVideo) {
+    const armVideoScrub = () => {
+      videoDuration = heroVideo.duration || 0;
+      if (!videoDuration) return;
+      videoScrubReady = true;
+      heroVideo.pause();
+    };
+    if (heroVideo.readyState >= 1) {
+      armVideoScrub();
+    } else {
+      heroVideo.addEventListener('loadedmetadata', armVideoScrub, { once: true });
+    }
+  }
+
+  // Entrance "pop": scales in from slightly small with a soft overshoot
+  // past 1 before settling, instead of a flat linear scale-up.
+  function bopScale(p) {
+    p = Math.max(0, Math.min(1, p));
+    return 0.92 + p * 0.08 + Math.sin(p * Math.PI) * 0.05;
+  }
+
+  function syncLayout() {
+    navHeight = navEl ? navEl.getBoundingClientRect().height : 72;
+    stickyHeight = window.innerHeight - navHeight;
+    const animationRange = window.innerHeight * 1.15;
+    pinSection.style.height = (stickyHeight + animationRange) + 'px';
+
+    // Absolute document position of the section's top, independent of current scroll
+    const scrollY = window.scrollY || window.pageYOffset;
+    const sectionDocTop = pinSection.getBoundingClientRect().top + scrollY;
+    pinStart = sectionDocTop - navHeight;
+    pinEnd = pinStart + animationRange;
+
+    pinSticky.style.width = '100%';
+    pinSticky.style.height = stickyHeight + 'px';
+  }
+
+  function updatePin() {
+    ticking = false;
+    const scrollY = window.scrollY || window.pageYOffset;
+
+    if (scrollY < pinEnd) {
+      pinSticky.style.position = 'fixed';
+      pinSticky.style.top = navHeight + 'px';
+      pinSticky.style.left = '0';
+    } else {
+      // Past the animation range: lock at the bottom of the section so
+      // the page can continue scrolling with no visual jump.
+      pinSticky.style.position = 'absolute';
+      pinSticky.style.top = (pinSection.offsetHeight - stickyHeight) + 'px';
+      pinSticky.style.left = '0';
+    }
+
+    let progress = (scrollY - pinStart) / (pinEnd - pinStart || 1);
+    progress = Math.max(0, Math.min(1, progress));
+
+    // Drive the hero video's playback position directly from scroll
+    // progress, like a scrubbed product-reveal clip (NVIDIA/Apple style)
+    // instead of letting it free-run on its own clock. Clamped just shy of
+    // the end so a seek never lands exactly on the last frame boundary.
+    if (heroVideo && videoScrubReady) {
+      const targetTime = Math.min(progress * videoDuration, videoDuration - 0.08);
+      if (Math.abs(heroVideo.currentTime - targetTime) > 0.01) {
+        heroVideo.currentTime = targetTime;
+      }
+    }
+
+    // Phase structure: hold hero -> crossfade -> hold intro -> crossfade -> hold third -> release
+    // 0.00-0.25  hero fully static (locked)
+    // 0.25-0.36  hero fades + lifts out
+    // 0.32-0.43  intro fades + settles in
+    // 0.43-0.64  intro fully static (locked)
+    // 0.64-0.74  intro fades + lifts out
+    // 0.69-0.81  third fades + settles in
+    // 0.81-1.00  third fully static (locked) until unpin
+    const heroP = Math.max(0, Math.min(1, (progress - 0.25) / 0.11));
+    const heroOpacity = 1 - heroP;
+    const heroY = -heroP * 50;
+    const heroScale = 1 - heroP * 0.06;
+
+    const introInP = Math.max(0, Math.min(1, (progress - 0.32) / 0.11));
+    const introOutP = Math.max(0, Math.min(1, (progress - 0.64) / 0.10));
+    const introOpacity = Math.max(0, Math.min(1, introInP - introOutP));
+    const introY = (1 - introInP) * 50 - introOutP * 50;
+    const introScale = bopScale(introInP) * (1 - introOutP * 0.05);
+
+    const thirdInP = Math.max(0, Math.min(1, (progress - 0.69) / 0.12));
+    const thirdOpacity = thirdInP;
+    const thirdY = (1 - thirdInP) * 50;
+    const thirdScale = bopScale(thirdInP);
+
+    pinHero.style.opacity = heroOpacity;
+    pinHero.style.transform = 'translateY(' + heroY + 'px) scale(' + heroScale + ')';
+    pinHero.style.pointerEvents = heroOpacity < 0.05 ? 'none' : 'auto';
+
+    pinIntro.style.opacity = introOpacity;
+    pinIntro.style.transform = 'translateY(' + introY + 'px) scale(' + introScale + ')';
+    pinIntro.style.pointerEvents = introOpacity < 0.05 ? 'none' : 'auto';
+
+    pinThird.style.opacity = thirdOpacity;
+    pinThird.style.transform = 'translateY(' + thirdY + 'px) scale(' + thirdScale + ')';
+    pinThird.style.pointerEvents = thirdOpacity < 0.05 ? 'none' : 'auto';
+
+    // Soften the release: crossfade the whole pinned hero into the page
+    // background over the last stretch of the scroll-jack, instead of a
+    // hard cut the instant it unpins.
+    const unpinFadeP = Math.max(0, Math.min(1, (progress - 0.90) / 0.10));
+    heroUnpinFade.style.opacity = unpinFadeP;
+
+    // Color flow: blend the glow/accent colors based on which stage is dominant
+    const stageColors = [
+      { r1: 2,   g1: 132, b1: 199, r2: 6,   g2: 182, b2: 212 },  // blue (hero)
+      { r1: 124, g1: 58,  b1: 237, r2: 192, g2: 132, b2: 252 },  // purple (intro)
+      { r1: 217, g1: 119, b1: 6,   r2: 251, g2: 191, b2: 36  }   // amber (third)
+    ];
+    const totalW = heroOpacity + introOpacity + thirdOpacity;
+    const w = totalW > 0.001 ? totalW : 1;
+    const heroW = totalW > 0.001 ? heroOpacity : 1;
+    const introW = totalW > 0.001 ? introOpacity : 0;
+    const thirdW = totalW > 0.001 ? thirdOpacity : 0;
+    const blend = (key) => Math.round(
+      (heroW * stageColors[0][key] + introW * stageColors[1][key] + thirdW * stageColors[2][key]) / w
+    );
+    pinSticky.style.setProperty('--flow-r1', blend('r1'));
+    pinSticky.style.setProperty('--flow-g1', blend('g1'));
+    pinSticky.style.setProperty('--flow-b1', blend('b1'));
+    pinSticky.style.setProperty('--flow-r2', blend('r2'));
+    pinSticky.style.setProperty('--flow-g2', blend('g2'));
+    pinSticky.style.setProperty('--flow-b2', blend('b2'));
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(updatePin);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { syncLayout(); onScroll(); });
+  syncLayout();
+  updatePin();
+  requestAnimationFrame(() => { syncLayout(); updatePin(); });
+  window.addEventListener('load', () => { syncLayout(); updatePin(); });
+  setTimeout(() => { syncLayout(); updatePin(); }, 300);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { syncLayout(); updatePin(); });
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+if (!location.hash) {
+  window.scrollTo(0, 0);
+}
+routeFromHash();
+</script>
+
+<script type="module">
+/* ============================================================
+   CONTACT WAVE — a dim, ambient InstancedMesh wave field behind the
+   contact card. Ported from an earlier three.js/R3F experiment
+   ("InstancedWave"), recolored to the site's blue/cyan accent and
+   simplified to run continuously (no scroll-linked progress needed
+   here) with a light cursor-follow instead.
+   ============================================================ */
+(async function () {
+  const canvas = document.getElementById('contactWave');
+  const contactEl = document.querySelector('.contact');
+  if (!canvas || !contactEl) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let THREE;
+  try {
+    THREE = await import('three');
+  } catch (e) {
+    return; // decorative only — fail quietly if the CDN import doesn't load
+  }
+
+  function readColor(varName, fallback) {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return new THREE.Color(v || fallback);
+  }
+
+  // Wide + shallow, to match the contact card's own proportions and fill
+  // most of it, rather than a small patch floating in a corner.
+  const GRID_X = 34;
+  const GRID_Z = 13;
+  const SPACING = 0.46;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 50);
+  camera.position.set(0, 2.7, 7.6);
+  camera.lookAt(0, 0.3, 0);
+
+  const group = new THREE.Group();
+  const REST_TILT = -0.16;
+  group.rotation.x = REST_TILT;
+  scene.add(group);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.45);
+  scene.add(ambient);
+  const lightA = new THREE.PointLight(readColor('--accent-2', '#06B6D4'), 70);
+  lightA.position.set(5, 8, 5);
+  scene.add(lightA);
+  const lightB = new THREE.PointLight(readColor('--accent', '#0284C7'), 32);
+  lightB.position.set(-5, -3, -4);
+  scene.add(lightB);
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: readColor('--accent-2', '#06B6D4'), roughness: 0.35, metalness: 0.5 });
+  const mesh = new THREE.InstancedMesh(geometry, material, GRID_X * GRID_Z);
+  group.add(mesh);
+  const dummy = new THREE.Object3D();
+
+  function refreshThemeColors() {
+    lightA.color = readColor('--accent-2', '#06B6D4');
+    lightB.color = readColor('--accent', '#0284C7');
+    material.color = readColor('--accent-2', '#06B6D4');
+  }
+  const themeToggleBtn = document.getElementById('themeToggle');
+  if (themeToggleBtn) themeToggleBtn.addEventListener('click', () => setTimeout(refreshThemeColors, 0));
+
+  function resize() {
+    const w = contactEl.clientWidth, h = contactEl.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Cursor interaction, in two parts: a slow whole-field tilt toward the
+  // cursor, and a localized ripple — cubes near the cursor's projected
+  // spot in the grid lift and shift as it moves through them.
+  let targetTiltX = 0, targetTiltY = 0, tiltX = 0, tiltY = 0;
+  let targetCursorX = 0, targetCursorZ = 0, cursorX = 0, cursorZ = 0;
+  let cursorActive = false;
+  const halfW = (GRID_X * SPACING) / 2;
+  const halfD = (GRID_Z * SPACING) / 2;
+  contactEl.addEventListener('mousemove', (e) => {
+    const rect = contactEl.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    targetTiltY = nx * 0.18;
+    targetTiltX = ny * 0.08;
+    targetCursorX = nx * halfW;
+    targetCursorZ = ny * halfD;
+    cursorActive = true;
+  });
+  contactEl.addEventListener('mouseleave', () => {
+    targetTiltX = 0; targetTiltY = 0;
+    cursorActive = false;
+  });
+
+  let visible = false;
+  const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: 0.01 });
+  io.observe(contactEl);
+
+  const RIPPLE_RADIUS = 2.4;
+  const RIPPLE_HEIGHT = 1.1;
+
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!visible) return;
+
+    // Slowed way down — a lingering drift rather than an active wave.
+    const t = clock.getElapsedTime() * 0.28;
+
+    tiltX += (targetTiltX - tiltX) * 0.03;
+    tiltY += (targetTiltY - tiltY) * 0.03;
+    cursorX += (targetCursorX - cursorX) * 0.06;
+    cursorZ += (targetCursorZ - cursorZ) * 0.06;
+    const rippleAmount = cursorActive ? 1 : 0;
+
+    let i = 0;
+    for (let x = 0; x < GRID_X; x++) {
+      for (let z = 0; z < GRID_Z; z++) {
+        const px = (x - GRID_X / 2) * SPACING;
+        const pz = (z - GRID_Z / 2) * SPACING;
+        const wave = Math.sin(x * 0.35 + t * 1.1) * Math.cos(z * 0.35 + t * 0.8);
+
+        const dx = px - cursorX, dz = pz - cursorZ;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        const ripple = Math.max(0, 1 - dist / RIPPLE_RADIUS);
+        const bump = ripple * ripple * RIPPLE_HEIGHT * rippleAmount;
+
+        dummy.position.set(px, wave * 0.4 + bump, pz);
+        dummy.scale.setScalar(0.14 + Math.abs(wave) * 0.035 + ripple * rippleAmount * 0.09);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i++, dummy.matrix);
+      }
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+
+    group.rotation.x = REST_TILT + tiltX;
+    group.rotation.y = tiltY + t * 0.03;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
